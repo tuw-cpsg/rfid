@@ -14,7 +14,7 @@
 import rospy
 from std_msgs.msg import String
 from rfid.srv import *
-from RFIDReaderInterface import *
+from rfid_reader_interface import *
 
 doShutdown=False
 

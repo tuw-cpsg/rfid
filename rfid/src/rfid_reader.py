@@ -16,7 +16,7 @@ import serial
 import sys
 import time
 #from rfid_tag_sender import *
-from RFIDReaderInterface import *
+from rfid_reader_interface import *
 from rfid_cmd_receiver import *
 from rfid_tag_sender import *
 
@@ -60,8 +60,8 @@ def close_interface(ser):
 
 
 ############################################################
-# read function, is called each time the RFIDReaderInterface
-# wants to read from the reader
+# read function, is called each time a function inside
+# rfid_reader_interface.py wants to read from the reader
 ############################################################
 
 def read_from_ser() :

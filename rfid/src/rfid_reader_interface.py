@@ -179,7 +179,7 @@ def init_msg_structure() :
 	msg_struct = {}
 	msg_struct['command'] = bytearray.fromhex('')
 	msg_struct['data'] = bytearray.fromhex('')
-	
+
 	return msg_struct
 
 ############################################################
@@ -304,22 +304,22 @@ def get_id_from_single_inventory(msg) :
     print_debug("ret code: " +
 		get_ret_text(msg[SINGLE_INV_STATUS_POS]) )
 
-	# how many IDs were delivered
+    # how many IDs were delivered
     IDcount=msg[SINGLE_INV_COUNT_POS]
 
-	# strip header
-    msg=msg[SINGLE_INV_HEADER_CNT:] 
+    # strip header
+    msg=msg[SINGLE_INV_HEADER_CNT:]
 
     for i in range(IDcount) :
         lengthTag=msg[SINGLE_INV_TAG_LENGTH_POS]
         lengthID=msg[SINGLE_INV_ID_LENGTH_POS]
 
-		# read ID
+	# read ID
         for j in range(lengthID):
             id += '%02X' % msg[j + SINGLE_INV_ID_START]
 
-		# if RSSI value present
-        if lengthTag > (lengthID+2) : 
+	# if RSSI value present
+        if lengthTag > (lengthID+2) :
             if msg[SINGLE_INV_ID_START+lengthID] == START_BYTE_RSSI :
 	            id += " %02X" %	msg[SINGLE_INV_ID_START+lengthID+1]
             else:
@@ -370,7 +370,7 @@ def process_fct_9003(msg) :
 
 def process_fct_9002(msg) :
     print_debug("got RFID Tag ID")
-    
+
     print_msg(msg['data'])
     id=get_id_from_cyclic_interrupt(msg['data'])
     print_debug("ids " + id)
@@ -404,7 +404,7 @@ def process_fct_9005(msg) :
 
 def process_fct_5001(msg) :
     print_debug("single inventory returned:")
-    
+
     print_msg(msg['data'])
     id=get_id_from_single_inventory(msg['data'])
     print_debug("ids: " + id)
@@ -415,7 +415,7 @@ def process_fct_5001(msg) :
     responseText['singleInv']="single inventory " + \
     "finished, IDs read:\n"
 
-	# print each ID in own line
+    # print each ID in own line
     for i in range(len(ids)/2) :
         responseText['singleInv']+="ID #" + str(i+1) \
         + ": " + ids[i*2] + "\n"
@@ -471,7 +471,7 @@ def process_fct_5004(msg) :
 
 def process_fct_0101(msg) :
     print_debug("got serial number of device: ")
-    
+
     print_msg(msg['data'])
 
     responseText['serialNr']="serial number of device: " + \
@@ -549,7 +549,7 @@ def process_fct_0107(msg) :
         print_debug("state of reader is unknown state")
         responseText['readerState']="reader is currently in" + \
         "unknown state"
-   
+
     gotResponse['readerState']=True
 
 ############################################################
@@ -560,7 +560,7 @@ def process_fct_0201(msg) :
     print_debug("got attenuation: ")
     print_msg(msg['data'])
 
-	# if command was not successful only return error code
+    # if command was not successful only return error code
     if msg['data'][0] != RFE_RET_SUCCESS :
         responseText['att']="get attenuation command returned" + \
         get_ret_text(msg['data'][0])
@@ -579,14 +579,14 @@ def process_fct_0202(msg) :
     print_debug("got frequency: ")
     print_msg(msg['data'])
 
-	# if command was not successful only return error code
+    # if command was not successful only return error code
     if msg['data'][0] != 0 :
         responseText['freq']="get frequency command returned" + \
         get_ret_text(msg['data'][0])
         gotResponse['freq']=True
         return
 
-	# determine frequency mode
+    # determine frequency mode
     responseText['freq']= "current mode: "
     if msg['data'][1] in freqModeText :
         responseText['freq']+= freqModeText[msg['data'][1]] + "\n"
@@ -596,11 +596,11 @@ def process_fct_0202(msg) :
     responseText['freq']+= "max frequencies: " \
     + str(msg['data'][2]) + "\n"
 
-	# print each frequency value in own row
+    # print each frequency value in own row
     for i in range(msg['data'][3]) :
         pos=4+i*3
         freq=0
-		#convert hex value to int
+	#convert hex value to int
         for j in range(3) :
             freq=(freq<<8) + msg['data'][pos+j]
 
@@ -618,15 +618,14 @@ def process_fct_0203(msg) :
     print_debug("got sensitivity: ")
     print_msg(msg['data'])
 
-	# if command was not successful only return error code
+    # if command was not successful only return error code
     if msg['data'][0] != RFE_RET_SUCCESS :
         responseText['sens']="get sensitivity command returned" + \
         get_ret_text(msg['data'][0])
         gotResponse['sens']=True
         return
 
-	# convert hex to int values
-    #values=struct.unpack("hhh",msg['data'][1:])
+    # convert hex to int values
     text=msg_to_string(msg['data'])
     value1=hex_to_int16(text[2:6],16)
     value2=hex_to_int16(text[6:10],16)
@@ -637,7 +636,7 @@ def process_fct_0203(msg) :
     responseText['sens'] += "min sensitivity: 0x" + text[6:10] \
     + " (" + str(value2) + " dBm)\n"
     responseText['sens'] += "current sensitivity: 0x" + \
-    text[10:14] + " (" + str(value3) + " dBm)"        
+    text[10:14] + " (" + str(value3) + " dBm)"
 
     gotResponse['sens']=True
 
@@ -690,11 +689,12 @@ def process_fct_0283(msg) :
     "finished: " + get_ret_text(msg['data'][0]) + "\n"
 
     text=msg_to_string(msg['data'][1:])
-	# convert hex value to int
-    values=struct.unpack("bb",msg['data'][1:])
+
+    # convert hex value to int
+    value=hex_to_int16(text[2:6],16)
 
     responseText['setSens']+="sensitivity set to value " + \
-    text + " (" + str(values[1]) +  " dBm)"
+    text + " (" + str(value) +  " dBm)"
 
     gotResponse['setSens']=True
 
@@ -900,7 +900,7 @@ def get_msg(cmd_struct) :
 
     msg_length = MSG_LENGTH_INIT
 
-	# if data to send available alter length
+    # if data to send available alter length
     if len(cmd_struct['data']) != 0 :
         msg_length += len(cmd_struct['data']) + 1
 
@@ -946,12 +946,13 @@ def get_msg(cmd_struct) :
 ############################################################
 
 def readMessage() :
-    
+
     input_byte= readFct()
     msg_rcv = init_msg_structure()
 
     i=0
-	# check preamble bytes
+
+    # check preamble bytes
     while i < 4 :
         if input_byte[0] != msg_structure[i] :
             str="got wrong msg structure " + input_byte[0]
@@ -993,16 +994,12 @@ def readMessage() :
 
     count=0
     msg_rcv['data'] = bytearray(msg_rcv['length'])
-    
+
     while count < msg_rcv['length'] :
         input_byte = readFct()
         checksum ^= input_byte[0]
         msg_rcv['data'][count] = input_byte[0]
         count += 1
-
-#    msg_rcv['data'] = getbyte(ser,msg_rcv['length'])
-#    for i in msg_rcv['data']:
-#        checksum ^= i
 
     input_byte = readFct()
 
@@ -1017,8 +1014,8 @@ def readMessage() :
         print("received incorrect checksum, got "
               + str(input_byte[0]) + " but expected " + str(checksum))
 
-	# call corresponding process function or default function if
-	# none defined
+    # call corresponding process function or default function if
+    # none defined
     if msg_rcv['command'] in process_fct :
         process_fct[msg_rcv['command']](msg_rcv)
     else :
@@ -1064,8 +1061,8 @@ def wait_for_response (command) :
 ############################################################
 
 def set_write_fct (fctPtr) :
-    
-    global writeFct 
+
+    global writeFct
     writeFct=fctPtr
 
 ############################################################
@@ -1096,7 +1093,7 @@ def send_rssi_on ():
     print_msg(msg)
     writeFct(msg)
 
-    return "set RSSI " + wait_for_response('paramSet') 	
+    return "set RSSI " + wait_for_response('paramSet')
 
 ############################################################
 # deactivates sending of RSSI values
@@ -1108,7 +1105,7 @@ def send_rssi_off ():
     print_msg(msg)
     writeFct(msg)
 
-    return "reset RSSI " + wait_for_response('paramSet') 	
+    return "reset RSSI " + wait_for_response('paramSet')
 
 ############################################################
 # activates cyclic inventory mode
@@ -1118,9 +1115,9 @@ def send_cyclic_on ():
     print_debug("sending set cyclic on")
     msg=get_msg(cyclic_inv_on)
     print_msg(msg)
-    writeFct(msg)  
+    writeFct(msg)
 
-    return wait_for_response('cyclicInv') 
+    return wait_for_response('cyclicInv')
 
 ############################################################
 # deactivates cyclic inventory mode
@@ -1130,7 +1127,7 @@ def send_cyclic_off ():
     print_debug("sending set cyclic off")
     msg=get_msg(cyclic_inv_off)
     print_msg(msg)
-    writeFct(msg)     
+    writeFct(msg)
 
     return wait_for_response('cyclicInv')
 
@@ -1145,7 +1142,7 @@ def send_cyclic_on_time (time):
     cyclic_inv_on_time['data']=bytearray.fromhex(time)
     msg=get_msg(cyclic_inv_on_time)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('cyclicInv')
 
@@ -1157,7 +1154,7 @@ def send_single_inv ():
     print_debug("sending single inventory")
     msg=get_msg(single_inv)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('singleInv')
 
@@ -1169,8 +1166,8 @@ def send_tag_behav_imm ():
     print_debug("sending tag behaviour immediatly")
     msg=get_msg(set_tag_behav_imm)
     print_msg(msg)
-    writeFct(msg) 
-    
+    writeFct(msg)
+
     return "send Tag immediatly " + wait_for_response('paramSet') 
 
 ############################################################
@@ -1182,9 +1179,9 @@ def send_tag_behav_once ():
     print_debug("sending tag behaviour once")
     msg=get_msg(set_tag_behav_once)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
-    return "send Tag once " + wait_for_response('paramSet') 
+    return "send Tag once " + wait_for_response('paramSet')
 
 ############################################################
 # initiates sending of serial number
@@ -1194,7 +1191,7 @@ def send_serial_number ():
     print_debug("sending serial number request")
     msg=get_msg(serial_number)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('serialNr')
 
@@ -1206,7 +1203,7 @@ def send_hardware_rev ():
     print_debug("sending hardware revision request")
     msg=get_msg(hardware_rev)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('hardwareRev')
 
@@ -1218,7 +1215,7 @@ def send_software_rev ():
     print_debug("sending software revision request")
     msg=get_msg(software_rev)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('softwareRev')
 
@@ -1230,7 +1227,7 @@ def send_status_reg ():
     print_debug("sending status register request")
     msg=get_msg(get_status_reg)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('statusReg')
 
@@ -1242,7 +1239,7 @@ def send_curr_state ():
     print_debug("sending reader state request")
     msg=get_msg(get_curr_state)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('readerState')
 
@@ -1254,7 +1251,7 @@ def send_att ():
     print_debug("sending attenuation request")
     msg=get_msg(get_att)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('att')
 
@@ -1332,7 +1329,7 @@ def send_set_att (attValue):
     set_att['data']=bytearray.fromhex(attValue)
     msg=get_msg(set_att)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('setAtt')
 
@@ -1350,7 +1347,7 @@ def send_set_sens (sensValue):
     set_sens['data']=bytearray.fromhex(sensValue)
     msg=get_msg(set_sens)
     print_msg(msg)
-    writeFct(msg) 
+    writeFct(msg)
 
     return wait_for_response('setSens')
 
@@ -1376,8 +1373,8 @@ def send_change_id (old_new_id):
     ids=old_new_id.split(' ')
     if len(ids) != 2 :
         print_debug("got only one value for id, aborting")
-        return "ERROR: specify old an new ID separated by a blank"
-   
+        return "ERROR: specify old and new ID separated by a blank"
+
     length_id0 = "%02X" % (len(ids[0])/2)
     length_id1 = "%02X" % (len(ids[1])/2)
 
@@ -1404,7 +1401,7 @@ def send_write_to_tag (data):
         + " to tag, aborting")
         return "ERROR: properties structure violated, " \
         + "must be: ID memoryBank address password data"
-   
+
     if len(dataVals[1]) != 2:
         print_debug("memory bank has to have 2 hex digits")
         return "memory bank has to have 2 hex digits"
@@ -1444,7 +1441,7 @@ def send_read_from_tag (data):
         + " to tag, aborting")
         return "ERROR: properties structure violated, " \
         + "must be: ID memoryBank address password dataLength"
-   
+
     if len(dataVals[1]) != 2:
         print_debug("memory bank has to have 2 hex digits")
         return "memory bank has to have 2 hex digits"

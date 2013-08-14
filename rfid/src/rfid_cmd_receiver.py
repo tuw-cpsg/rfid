@@ -120,6 +120,6 @@ def rfid_settings_start_server():
 def got_shutdown () :
     global doShutdown
     return doShutdown
-        
+
 ############################################################
 

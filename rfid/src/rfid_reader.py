@@ -15,7 +15,6 @@
 import serial
 import sys
 import time
-#from rfid_tag_sender import *
 from rfid_reader_interface import *
 from rfid_cmd_receiver import *
 from rfid_tag_sender import *
@@ -45,8 +44,8 @@ def open_interface(port):
     ser=serial.Serial(port,baudrate=BAUDRATE, parity =
                       PARITY, stopbits=STOPBIT)
 
-	# it may be necessary to comment the following line in,
-	# however on my MAC this threw an error
+    # it may be necessary to comment the following line in,
+    # however on my MAC this threw an error
     #ser.open()
 
     return ser
@@ -80,35 +79,30 @@ if __name__ == '__main__':
         usage()
         exit(1)
 
-	# start ROS topic
+    # start ROS topic
     openPublisher("rfid_tag_id","rfid_reader")
 
-	# start ROS service
+    # start ROS service
     rfid_settings_start_server()
 
-	# open serial interface on defined port
+    # open serial interface on defined port
     ser=open_interface(sys.argv[1])
 
-	# set reference to read and write fct
+    # set reference to read and write fct
     set_write_fct(ser.write)
-    set_read_fct(read_from_ser)    
+    set_read_fct(read_from_ser)
 
     while 1:
-		# if shutdown command was received quit
+	# if shutdown command was received quit
         if got_shutdown() == True :
             break
-        
-		# as long as input data are waiting at the reader
-		# interface continue reading
-        #try:
+
+	# as long as input data are waiting at the reader
+	# interface continue reading
         while ser.inWaiting() != 0 :
             readMessage()
-        #except:
-        #    print_debug("Serial interface not readable")
-        #    time.sleep(10*SLEEP_TIME)
-        #    ser=open_interface(sys.argv[1])
 
-		# sleep prevents busy waiting
+	# sleep prevents busy waiting
         time.sleep(SLEEP_TIME)
-    
+
     close_interface(ser)

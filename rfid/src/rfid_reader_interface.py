@@ -627,9 +627,9 @@ def process_fct_0203(msg) :
 
     # convert hex to int values
     text=msg_to_string(msg['data'])
-    value1=hex_to_int16(text[2:6],16)
-    value2=hex_to_int16(text[6:10],16)
-    value3=hex_to_int16(text[10:14],16)
+    value1=hex_to_int16(text[2:6])
+    value2=hex_to_int16(text[6:10])
+    value3=hex_to_int16(text[10:14])
 
     responseText['sens'] = "max sensitivity: 0x" + text[2:6] \
     + " (" + str(value1) + " dBm)\n"
@@ -691,7 +691,7 @@ def process_fct_0283(msg) :
     text=msg_to_string(msg['data'][1:])
 
     # convert hex value to int
-    value=hex_to_int16(text[2:6],16)
+    value=hex_to_int16(text)
 
     responseText['setSens']+="sensitivity set to value " + \
     text + " (" + str(value) +  " dBm)"
